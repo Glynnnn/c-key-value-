@@ -11,7 +11,7 @@ kv_t* kv_init(int capacity){
     if (kv_table == NULL) return NULL;
 
     kv_table->capacity=capacity;
-    kv_table->size=0;
+    kv_table->count=0;
 
     kv_table->entries = calloc(kv_table->capacity, sizeof(kv_entry_t));
 

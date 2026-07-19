@@ -1,0 +1,21 @@
+#ifndef KV_H
+#define KV_H
+
+#include <stdio.h>
+
+typedef struct{
+    char *key;
+    char *value;
+}kv_entry_t;
+
+
+typedef struct
+{
+    size_t capacity;
+    size_t size;
+    kv_entry_t *entries;
+}kv_t;
+
+kv_t* kv_init(int capacity);
+
+#endif

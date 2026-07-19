@@ -16,6 +16,6 @@ typedef struct
     kv_entry_t *entries;
 }kv_t;
 
-kv_t* kv_init(int capacity);
+kv_t *kv_init(size_t capacity);
 
 #endif

@@ -59,7 +59,7 @@ void assign_new_kv(kv_t *table, int index, char *p_new_key, char *p_new_value){
 
 int kv_put(kv_t *table, char *key, char *value){
 
-    if(key == NULL || value == NULL) return -1;
+    if(key == NULL || value == NULL || table == NULL) return -1;
 
 
     unsigned short index = get_index(key, table->capacity);
@@ -89,7 +89,7 @@ int kv_put(kv_t *table, char *key, char *value){
         //     printf("Value: %s\n", table->entries[index + i].value);
         // printf("Added at: %d\n", index + i);
 
-            return index + i;
+            return 0;
         }
         else if (!strcmp(extracted_key, key))
         {
@@ -105,7 +105,7 @@ int kv_put(kv_t *table, char *key, char *value){
             // printf("Key: %s\n", table->entries[index + i].key);
             // printf("Value: %s\n", table->entries[index + i].value);
 
-            return index + i;
+            return 0;
 
         }
         else if (extracted_key == TOMBSTONE)
@@ -136,7 +136,7 @@ int kv_put(kv_t *table, char *key, char *value){
         // printf("Key: %s\n", table->entries[index_tombstone].key);
         // printf("Value: %s\n", table->entries[index_tombstone].value);
 
-        return index_tombstone;
+        return 0;
     }
 
     if (table->count >= table->capacity) return -1;

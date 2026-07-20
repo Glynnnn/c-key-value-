@@ -27,8 +27,8 @@ kv_t* kv_init(size_t capacity){
     return kv_table;
 }
 
-unsigned short get_index(char *key, size_t capacity){
-    unsigned short hash = 5381;
+size_t get_index(char *key, size_t capacity){
+    size_t hash = 5381;
 
     int c;
 
@@ -38,109 +38,79 @@ unsigned short get_index(char *key, size_t capacity){
     return hash % capacity;
 }
 
-int allocate_k_v(char **p_key, char **p_value, char *key, char *value){
-    
-    char *p_new_key = malloc(sizeof(char) * (strlen(key) + 1));
-    char *p_new_value = malloc(sizeof(char) * (strlen(value) + 1));
-
-    if (p_new_value == NULL || p_new_key == NULL) return -1;
-
-    *p_key = p_new_key;
-    *p_value = p_new_value;
-
-    return 0;
-}
-
-void assign_new_kv(kv_t *table, int index, char *p_new_key, char *p_new_value){
-        table->entries[index].key = p_new_key;
-        table->entries[index].value = p_new_value;
-        table->count++;
-}
 
 int kv_put(kv_t *table, char *key, char *value){
 
-    if(key == NULL || value == NULL || table == NULL) return -1;
-
+    if(!table || !key || !value) return -1;
 
     unsigned short index = get_index(key, table->capacity);
 
-    // printf("INDEX: %d\n", index);
-
-    // init tombstone to an index greater than the table capacity so we can check if it has been set
     int index_tombstone = table->capacity + 1;
 
-    for (int i = 0; i + index < table->capacity; i++){
+    for (int i = 0; i < table->capacity; i++){
         
-        char *extracted_key = table->entries[index + i].key;
+        size_t real_index = (index + i) % table->capacity;
+        kv_entry_t *entry = &table->entries[real_index];
 
+        if (entry->key == NULL){
+            char *p_new_key = strdup(key);
+            char *p_new_value = strdup(value);
 
-        if (extracted_key == NULL){
-            char *p_new_key;
-            char *p_new_value;
+            if (!p_new_key || !p_new_value ){
 
-            if (allocate_k_v(&p_new_key, &p_new_value, key, value) == -1) return -1;
+                free(p_new_key);
+                free(p_new_value);
+                return -1;
+            } 
 
-            strcpy(p_new_key, key);
-            strcpy(p_new_value, value);
-
-            assign_new_kv(table, index + i, p_new_key, p_new_value);
-
-        //     printf("Key: %s\n", table->entries[index + i].key);
-        //     printf("Value: %s\n", table->entries[index + i].value);
-        // printf("Added at: %d\n", index + i);
+            entry->key = p_new_key;
+            entry->value = p_new_value;
+            table->count++;
 
             return 0;
         }
-        else if (!strcmp(extracted_key, key))
+        else if (entry->key && entry->key != TOMBSTONE && !strcmp(entry->key, key))
         {
 
-            char *p_new_value = malloc(sizeof(char) * (strlen(value) + 1));
+            char *p_new_value = strdup(value);
 
             if (p_new_value == NULL) return -1;
 
-            free(table->entries[index + i].value);
-            strcpy(p_new_value, value);
-            table->entries[index + i].value = p_new_value;
-
-            // printf("Key: %s\n", table->entries[index + i].key);
-            // printf("Value: %s\n", table->entries[index + i].value);
+            free(table->entries[real_index].value);
+            table->entries[real_index].value = p_new_value;
 
             return 0;
 
         }
-        else if (extracted_key == TOMBSTONE)
+        else if (entry->key == TOMBSTONE)
         {
-
-
             // only keep track of the first tombstone occurence
             if (index_tombstone > table->capacity){
-                index_tombstone = index + i;
+                index_tombstone = real_index;
             }
         }
     
     }
     // if tombstone has been set
     if (index_tombstone < table->capacity){
-        char *p_new_key;
-        char *p_new_value;
+        char *p_new_key = strdup(key);
+        char *p_new_value = strdup(value);
 
-        if (allocate_k_v(&p_new_key, &p_new_value, key, value) == -1) return -1;
+        if (!p_new_key || !p_new_value ){
 
-        free(table->entries[index_tombstone].key);
+            free(p_new_key);
+            free(p_new_value);
+            return -1;
+        } 
 
-        strcpy(p_new_key, key);
-            strcpy(p_new_value, value);
-
-        assign_new_kv(table, index_tombstone, p_new_key, p_new_value);
-
-        // printf("Key: %s\n", table->entries[index_tombstone].key);
-        // printf("Value: %s\n", table->entries[index_tombstone].value);
+        table->entries[index_tombstone].key = p_new_key;
+        table->entries[index_tombstone].value = p_new_value;
+        table->count++;
 
         return 0;
     }
 
-    if (table->count >= table->capacity) return -1;
-
+    // table is full
     return -1;
 
 }

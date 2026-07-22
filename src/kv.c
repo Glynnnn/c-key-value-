@@ -53,6 +53,7 @@ int kv_put(kv_t *table, char *key, char *value){
         kv_entry_t *entry = &table->entries[real_index];
 
         if (entry->key == NULL){
+            // strdup allocates heap mem for a char* and returns it
             char *p_new_key = strdup(key);
             char *p_new_value = strdup(value);
 
@@ -112,6 +113,33 @@ int kv_put(kv_t *table, char *key, char *value){
 
     // table is full
     return -1;
+
+}
+
+char *kv_get(kv_t *table, char *key){
+
+    if (!key || !table) return NULL;
+
+    // hash the key to get the index
+    // loop through entire list until key is found or null is found
+    // return valur or null
+
+    int index = get_index(key, table->capacity);
+
+    for (int i = 0; i < table->capacity; i++){
+
+        int normalised_index = (index + i) % table->capacity;
+        kv_entry_t *entry = &table->entries[normalised_index];
+
+        if (entry->key && entry->key != TOMBSTONE && !strcmp(entry->key, key)){
+            return entry->value;
+        }
+        else if (entry->key == NULL)
+        {
+            return NULL;
+        }
+    }
+    return NULL;
 
 }
 

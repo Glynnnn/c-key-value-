@@ -9,7 +9,6 @@ int main(){
     if (kv_put(db, "Keanu", "Boss") == -1){
         printf("Error\n");
     }
-    printf("Value: %s\n", kv_get(db, "Keanu"));
 
     if (kv_put(db, "Gizmo", "Dog") == -1){
         printf("Error\n");
@@ -21,15 +20,20 @@ int main(){
         printf("Error\n");
     }
 
-    printf("Value: %s\n", kv_get(db, "Keanu"));
-    printf("Value: %s\n", kv_get(db, "Gizmo"));
-    printf("Value: %s\n", kv_get(db, "Mum"));
+    // printf("Value: %s\n", kv_get(db, "Keanu"));
+    // printf("Value: %s\n", kv_get(db, "Gizmo"));
+    // printf("Value: %s\n", kv_get(db, "Mum"));
 
-    // for (int i = 0; i < db->capacity; i++){
-    //     if (db->entries[i].key){
-    //         printf("[%d] %s : %s\n", i, db->entries[i].key, db->entries[i].value);
-    //     }
-    // }
+    kv_delete(db, "Keanu");
+    kv_delete(db, "Mum");
+    kv_delete(db, "Gizmo");
+
+
+    for (int i = 0; i < db->capacity; i++){
+        if (db->entries[i].key && db->entries[i].key != TOMBSTONE){
+            printf("[%d] %s : %s\n", i, db->entries[i].key, db->entries[i].value);
+        }
+    }
 
     return 0;
 }

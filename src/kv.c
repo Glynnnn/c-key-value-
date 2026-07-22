@@ -3,8 +3,6 @@
 
 #include "kv.h"
 
-#define TOMBSTONE ((char *)0x1)
-
 kv_t* kv_init(size_t capacity){
 
     if (capacity <= 0) return NULL;
@@ -131,16 +129,46 @@ char *kv_get(kv_t *table, char *key){
         int normalised_index = (index + i) % table->capacity;
         kv_entry_t *entry = &table->entries[normalised_index];
 
-        if (entry->key && entry->key != TOMBSTONE && !strcmp(entry->key, key)){
-            return entry->value;
-        }
-        else if (entry->key == NULL)
+        if (entry->key == NULL)
         {
             return NULL;
         }
+
+        else if (entry->key && entry->key != TOMBSTONE && !strcmp(entry->key, key)){
+            return entry->value;
+        }
+
     }
     return NULL;
 
 }
 
+
+int kv_delete(kv_t *table, char *key){
+
+    if (!table || !key) return -1;
+
+    int index = get_index(key, table->capacity);
+
+    for (int i = 0; i < table->capacity; i++){
+
+        int normalised_index = (index + i) % table->capacity;
+        kv_entry_t *entry = &table->entries[normalised_index];
+
+        if (entry->key == NULL){
+            return -1;
+        }
+        else if (entry->key && entry->key != TOMBSTONE && !strcmp(entry->key, key)){
+            free(entry->value);
+            free(entry->key);
+            entry->value = NULL;
+            entry->key = TOMBSTONE;
+            table->count--;
+            return 0;
+        }
+
+    }
+    return -1;
+
+}
 

@@ -34,6 +34,10 @@ int main(){
     //         printf("[%d] %s : %s\n", i, db->entries[i].key, db->entries[i].value);
     //     }
     // }
+    printf("%ld\n", db->capacity);
+
+    kv_free(db);
+    printf("%ld\n", db->capacity);
 
     return 0;
 }

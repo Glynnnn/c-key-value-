@@ -1,4 +1,4 @@
-FLAGS = -Wall
+FLAGS = -Wall -g
 SRC = $(wildcard src/*.c)
 
 ./bin/test: $(SRC) inc/kv.h

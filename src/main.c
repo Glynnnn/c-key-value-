@@ -24,16 +24,16 @@ int main(){
     // printf("Value: %s\n", kv_get(db, "Gizmo"));
     // printf("Value: %s\n", kv_get(db, "Mum"));
 
-    kv_delete(db, "Keanu");
-    kv_delete(db, "Mum");
-    kv_delete(db, "Gizmo");
+    // kv_delete(db, "Keanu");
+    // kv_delete(db, "Mum");
+    // kv_delete(db, "Gizmo");
 
 
-    for (int i = 0; i < db->capacity; i++){
-        if (db->entries[i].key && db->entries[i].key != TOMBSTONE){
-            printf("[%d] %s : %s\n", i, db->entries[i].key, db->entries[i].value);
-        }
-    }
+    // for (int i = 0; i < db->capacity; i++){
+    //     if (db->entries[i].key && db->entries[i].key != TOMBSTONE){
+    //         printf("[%d] %s : %s\n", i, db->entries[i].key, db->entries[i].value);
+    //     }
+    // }
 
     return 0;
 }
